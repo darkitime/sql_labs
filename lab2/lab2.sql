@@ -21,7 +21,8 @@ JOIN v6_partic AS pa ON p.id = pa.id
 JOIN v6_tutors AS t on t.id_tutor = p.id_tutor
 WHERE p.status = 'рабочий'
 GROUP BY t.faculty, p.name
-HAVING count(pa.id) > 3;
+HAVING count(pa.id) > 2
+ORDER BY count(pa.id);
 ---проектов, в которых нет активных участников.
 
 ---Убедиться с помощью запроса, что у каждого преподавателя не 
