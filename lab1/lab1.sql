@@ -2,7 +2,7 @@
 --Группа: 2
 --Вариант 6
 
---DROP TABLE IF EXISTS v6_partic CASCADE;
+DROP TABLE IF EXISTS v6_partic CASCADE;
 DROP TABLE IF EXISTS v6_proj CASCADE;
 --DROP TABLE IF EXISTS v6_students CASCADE;
 --DROP TABLE IF EXISTS v6_tutors CASCADE;
@@ -85,7 +85,7 @@ SELECT * FROM v6_proj;
 --(поле "Проект", "Студент", "Роль в проекте", "Дата начала участия", "Дата завершения участия").
 CREATE TABLE v6_partic(
     id NUMERIC(5,0) NOT NULL CONSTRAINT ref_id REFERENCES v6_proj,
-    stud_id NUMERIC(50) NOT NULL CONSTRAINT ref_stud_id REFERENCES v6_students,
+    stud_id NUMERIC(50) NULL CONSTRAINT ref_stud_id REFERENCES v6_students,
     role VARCHAR(50) NOT NULL,
     dbegin DATE NOT NULL,
     dend DATE NULL
@@ -99,7 +99,23 @@ VALUES
     (00000, 1234124127, 'лаборант','22.09.2026', NULL),
     (00000, 1234124123, 'лаборант','22.09.2026', NULL),
     (00000, 1234124124, 'лаборант','22.09.2026', NULL),
-    (00000, 1234124126, 'лаборант','22.09.2026', NULL);;
+    (00000, 1234124126, 'лаборант','22.09.2026', NULL);
+
+INSERT INTO v6_partic
+VALUES
+    (10101, NULL, 'Математик', '22.09.2026', NULL),
+    (10101, 1234124127, 'Химик', '22.09.2026', '22.09.2027');
+UPDATE v6_proj
+SET dend = '22.09.2028'
+WHERE id = 10101
+
+INSERT INTO v6_proj
+VALUES
+    (10102, 'ИКТ', 'прикладной',11, '22.09.2026', '22.09.2023','новый');
+INSERT INTO v6_partic
+VALUES
+    (10102, 1234124127, 'Химик', '22.09.2026', '22.09.2021');
+
 SELECT * FROM v6_partic;
 
 
