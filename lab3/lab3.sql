@@ -54,4 +54,26 @@ CREATE OR REPLACE VIEW
     OR (p.dend IS NOT NULL AND part.dend IS NULL AND p.dend < CURRENT_DATE);
         --не является обновляемым так выбирает данные более чем из одной таблицы
 
+---(10101, 'ИКТ', 'прикладной',11, '22.09.2026'(p.dbegin), '22.09.2027'(p.dend),'новый')
+---(11111, 'ВИ', 'прикладной',1414, '01.01.2025', '01.01.2026','в архиве')
+-- Ошибка 1: Начало участия раньше старта проекта (part.dbegin < p.dbegin)
+INSERT INTO v6_partic (id, stud_id, role, dbegin, dend)
+VALUES (10101, 1234124123, 'лаборант 1', '01.01.2026', '01.01.2027');
+
+-- Ошибка 2: Начало участия позже окончания проекта (part.dbegin > p.dend)
+INSERT INTO v6_partic (id, stud_id, role, dbegin, dend)
+VALUES (10101, 1234124124, 'лаборант 2', '01.10.2027', '01.11.2027');
+
+-- Ошибка 3: Окончание участия раньше старта проекта (part.dend < p.dbegin)
+INSERT INTO v6_partic (id, stud_id, role, dbegin, dend)
+VALUES (10101, 1234124125, 'лаборант 3', '01.01.2026', '01.05.2026');
+
+-- Ошибка 4: Окончание участия позже окончания проекта (part.dend > p.dend)
+INSERT INTO v6_partic (id, stud_id, role, dbegin, dend)
+VALUES (10101, 1234124126, 'лаборант 4', '01.10.2026', '01.01.2028');
+
+-- Ошибка 5: Участие не закрыто (dend IS NULL), хотя проект завершился и дата его окончания прошла
+INSERT INTO v6_partic (id, stud_id, role, dbegin, dend)
+VALUES (11111, 1234124127, 'лаборант 5', '01.02.2025', NULL);
+
 SELECT * FROM v6_errors_in_partic_data
