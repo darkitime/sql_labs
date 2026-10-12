@@ -1,0 +1,115 @@
+--Долголюк Даниил
+--Группа: 2
+--Вариант 6
+
+DROP TABLE IF EXISTS v6_partic CASCADE;
+DROP TABLE IF EXISTS v6_proj CASCADE;
+--DROP TABLE IF EXISTS v6_students CASCADE;
+--DROP TABLE IF EXISTS v6_tutors CASCADE;
+--DROP TABLE IF EXISTS v6_groups CASCADE;
+
+--Л.р. №1. Создание и заполнение отношений БД деканата.
+
+--1. Отношение "Группы" (поля "Номер группы", "Факультет").
+
+CREATE TABLE v6_groups(
+    grpno NUMERIC(2) NOT NULL CONSTRAINT pk_grp PRIMARY KEY,
+    faculty VARCHAR(80) NOT NULL
+);
+
+INSERT INTO v6_groups
+VALUES
+    (1, 'прикладная математика'),
+    (2, 'прикладная математика'),
+    (3, 'прикладная физика'),
+    (4, 'прикладная физика'),
+    (5, 'прикладная информатика');
+SELECT * FROM v6_groups;
+
+--2. Отношение "Преподаватели" (поля "ФИО", "Должность (старший преподаватель, доцент, профессор)", 
+--"Ученая степень (кандидат или доктор наук)", "Шифр научной специальности", "Факультет").
+CREATE TABLE v6_tutors(
+    id_tutor NUMERIC(5,0) NOT NULL CONSTRAINT pk_id_tut PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    post VARCHAR(40) NOT NULL CONSTRAINT check_post CHECK(post IN ('старший преподаватель', 'доцент', 'профессор')),
+    acdeg VARCHAR(30) NULL CONSTRAINT check_acdeg CHECK(acdeg IN ('кандидат наук','доктор наук')),
+    scienciph VARCHAR(30) NOT NULL,
+    faculty VARCHAR(80) NOT NULL
+);
+INSERT INTO v6_tutors
+VALUES
+    (11,'Максимов Михал Александрович', 'профессор','доктор наук','4.2.1','прикладная физика'),
+    (112,'Некосов Олег Владиславович', 'старший преподаватель', NULL ,'4.2.2','прикладная физика'),
+    (111,'Максимова Анна Викторовна', 'профессор','доктор наук','4.2.1','прикладная математика'),
+    (1414,'Алексеев Александр Андреевич', 'доцент','доктор наук','5.2.1','прикладная информатика'),
+    (0,'Попов Владимир Михайлович', 'доцент','кандидат наук','5.3.1','прикладная информатика');
+SELECT * FROM v6_tutors;
+
+--3.Отношение "Студенты" (поля "Номер зачетной книжки", "ФИО", "Группа", "Дата рождения").
+CREATE TABLE v6_students(
+    recnum NUMERIC(50) NOT NULL CONSTRAINT rk_recnum PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    grpno NUMERIC(2) NOT NULL CONSTRAINT ref_grp REFERENCES v6_groups,
+    birthday DATE NOT NULL
+);
+INSERT INTO v6_students
+VALUES
+    (1234124123, 'Андреев Виктор Александрович',1, '1.01.2003'),
+    (1234124124, 'Максимова Анастасия Михайловна', 3, '11.02.2003'),
+    (1234124125, 'Антонова Анастасия Михайловна', 2, '17.06.2003'),
+    (1234124126, 'Михайлов Михаил Михайлович', 4, '22.08.2003'),
+    (1234124127, 'Архипова Мария Петровна', 5, '3.09.2003');
+SELECT * FROM v6_students;
+
+--4. Проекты
+CREATE TABLE v6_proj(
+    id NUMERIC(5,0) NOT NULL CONSTRAINT pk_id PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    type VARCHAR(20) NOT NULL CONSTRAINT check_type CHECK(type IN (upper('нир'),'прикладной')),
+    id_tutor NUMERIC(5,0) NOT NULL CONSTRAINT ref_id_tutor REFERENCES v6_tutors,
+    dbegin DATE NOT NULL,
+    dend DATE NULL,
+    status VARCHAR(30) NOT NULL CONSTRAINT check_stat CHECK(status IN ('новый','рабочий', 'в архиве'))
+);
+INSERT INTO v6_proj
+VALUES
+    (10101, 'ИКТ', 'прикладной',11, '22.09.2026', '22.09.2027','новый'),
+    (11211, 'НКТ', 'НИР',112, '21.09.2026', NULL,'рабочий'),
+    (12111, 'ПУУУ', 'прикладной',111, '24.09.2026', NULL,'новый'),
+    (11111, 'ВИ', 'прикладной',1414, '01.01.2025', '01.01.2026','в архиве'),
+    (00000, 'ЛТИ', 'прикладной',0, '22.09.2026', NULL,'рабочий'),
+    (00001, 'ЛТИ', 'прикладной',0, '22.09.2027', NULL,'в архиве'),
+    (10102, 'ИКТ', 'прикладной',11, '22.09.2026', '22.09.2023','новый');
+SELECT * FROM v6_proj;
+
+--5. Отношение "Участие в проектах" 
+--(поле "Проект", "Студент", "Роль в проекте", "Дата начала участия", "Дата завершения участия").
+CREATE TABLE v6_partic(
+    id NUMERIC(5,0) NOT NULL CONSTRAINT ref_id REFERENCES v6_proj,
+    stud_id NUMERIC(50) NULL CONSTRAINT ref_stud_id REFERENCES v6_students,
+    role VARCHAR(50) NOT NULL,
+    dbegin DATE NOT NULL,
+    dend DATE NULL
+);
+INSERT INTO v6_partic
+VALUES
+    (10101, 1234124123, 'лаборант', '22.09.2026', NULL),
+    (11211, 1234124124, 'научный сотрудник','21.09.2026', NULL),
+    (12111, 1234124125, 'разработчик','24.09.2026', NULL),
+    (11111, 1234124126, 'лаборант','23.09.2026', '21.09.2027'),
+    (00000, 1234124127, 'лаборант','22.09.2026', NULL),
+    (00000, 1234124123, 'лаборант','22.09.2026', NULL),
+    (00000, 1234124124, 'лаборант','22.09.2026', NULL),
+    (00000, 1234124126, 'лаборант','22.09.2026', NULL),
+    (10101, NULL, 'Математик', '22.09.2026', NULL),
+    (10101, 1234124127, 'Химик', '22.09.2026', '22.09.2027'),
+    (10102, 1234124127, 'Химик', '22.09.2026', '22.09.2021');
+
+SELECT * FROM v6_partic;
+
+
+
+
+--Заполнение данных
+---\copy v6_groups FROM 'lab1/groups.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',');
+---SELECT * FROM v6_groups LIMIT 5;
