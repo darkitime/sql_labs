@@ -56,7 +56,6 @@ FROM v6_proj AS p
 JOIN v6_tutors AS t ON t.id_tutor = p.id_tutor
 LEFT JOIN v6_partic AS pa ON p.id = pa.id
 WHERE pa.id IS NULL
-GROUP BY t.faculty, p.name; 
 
 
 ---Убедиться с помощью запроса, что у каждого преподавателя не 
